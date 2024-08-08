@@ -1,0 +1,514 @@
+
+Student Details 
+Name and Surnames		 
+Deadline		 
+
+Activity 2. ADT in C++, management of chess tournament games
+
+Introduction: development of the C++ classes necessary to manage chess tournament games
+
+Activity 1 included classes about the pieces, squares and chess board. 
+
+In this activity those activities will be completed with new methods and new classes will be developed to allow using some of the ADT created during the course to easily manage a chess tournament.
+
+Goals
+
+The goals of this unit are as follows:
+
+? In general, the goal of this practical activity is to complete the library created in activity 1 and to expand it to be used to easily manage chess tournaments.
+? We will therefore set the following specific goals:
+* To select the most useful technique from the ones studied in the first course units.
+* To complete (through modification and extension) the chess-related classes included in those units. It is very important to follow the suggested course of action offered by this guide.
+* To add the methods and classes needed for the management set out in this guide.
+* To develop the main program (and other similar ones) described in this guide to test these classes.
+* It is very important to strictly follow the indications related to the classes required (class names, members, method signature and loss functions). You should understand that developing software requires absolute precision with these aspects to ensure the project’s success. Your solution will be assessed taking into consideration your ability to submit a working project complying with these instructions.
+
+Detailed description
+
+Throughout this description there will be development decisions presented as suggestions (like the design of the private part of the classes) and others that are mandatory (like the class names or method signatures where it is stated that it is mandatory).
+
+In general, you are free to complete all those aspects which are not described as mandatory  or which have not been defined and you consider appropriate.
+
+The different aspects of the application you should create are described, suggested and discussed below.
+
+About the boards
+
+You can start this activity from the classes used in activity 1, although you are asked to expand them to include the new functionality described below.
+
+
+
+How to display a board
+
+You must be able to offer the clearest possible representation of a chess board using text characters.
+
+The annex contains an example representation and the code fragment you can use if you like that representation. Bear in mind that these are Unicode characters, so in order to display them correctly, your device must be able to manage these characters (check the installation documents of your devices if you have a problem that cannot be solved with the instructions given below).
+
+? Linux distributions of Visual Studio Code are usually preset to manage them by default, so in general no special steps should be taken.
+? If you are using Visual Studio Code on Windows, you are probably using Windows Power Shell. In this case, you should make sure that the coding of the output files supports Unicode (the default Windows coding does not usually support this, you can check Windows Power Shell console using a command like the one below (or an equivalent mechanism).
+
+$OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+
+? You must also ensure that the console uses a single-space one (like DejaVu Sans Mono) as its font property value.
+
+Obs.- integration of the boards in the ADTs
+
+On the other hand, you must remember what was explained throughout the course to complete the Board class by overloading the necessary operators for their integration in ADTs.
+
+You must be especially careful with:
+
+? The comparison methods and operators.
+? Copying and assigning a specific table in new memory. In this sense, we recommend to ensure a copy is made in new memory whenever you want to create a board from a previous one. It is not the only alternative, but it will probably simplify your memory management.
+
+Be aware that you may have to add new methods and operators for the board attribute classes “in cascade” (such as the pieces, coordinates, squares, etc.)
+
+Movements on the strings representing the boards
+
+Activity 1 showed a representation of the chessboard in the form of a string.
+
+As a reminder, here is a possible declaration of a static attribute to represent the initial board of the games.
+
+const string Board::BOARD_START_GAME = "RNBQKBNRPPPPPPPP--------------------------------pppppppprnbqkbnr”;
+
+It is advisable to bear in mind the option to generate strings containing the boards showing each move in the game, in order to create the boards later based on these strings.
+
+We suggest you use the following method:
+
+string Board::moverString(	int numColumns, int numRows, 
+char c1, int f1, 
+char c2, int f2, 
+string str_board)
+
+
+
+Where:
+
+? The first two arguments determine the size of the board.
+? The next two are the starting positions for the move.
+? The next two are the destination positions.
+? The last argument is the string containing the board before the move using the same convention as seen in activity 1.
+? The method returns a string with the result of the move.
+
+Representation of the games
+
+Before describing the class to be implemented, the format of the files used to contain the games will be explained, with the following characteristics:
+
+? They are text files whose name contains the extension .a2pgn. The PGN format is a well-known format to represent games in IT applications used in the world of chess. The format shown here is a variant of this format that will simplify its management.
+? Each line of the file represents a movement with the following format:
+
+col1 row1 col2 row2+
+
+* col1 row1 are the move’s starting coordinates.
+* col2 row2 are the final ones.
+* + is a symbol that indicates that it is not the last move.
+* The last move is shown as follows:
+
+col1 row1 col2 row2*
+
+Games are to be represented using a Game class that must contain at least the following information:
+
+? An identification (name) of the string type.
+? An internal key of the int types to be used in the tournament. The annex contains a detailed description of how this key works and provides the code to forget about the low-level details and focus on the other functionality of the activity. It is enough to integrate this code in your application.
+? The list of boards that make up the game. You must use an unordered list as described in the course resources to represent the game.
+
+The methods to be implemented must include the following:
+
+? The methods you need for assigning and accessing the private part. It is advised to only implement what is essential in accordance with your design decisions or what is required in terms of compatibility with the mandatory part of the code to be implemented.
+? A default constructor.
+? A constructor to read a game from a file with the following signature:
+
+Game(string filename,string name, int dim);
+
+? Where:
+* The first argument is the name of the file containing the game in text mode according to the format explained previously.
+* The second is the name of the game.
+* The third is the size of the game boards (number of rows and columns).
+? It is advised to use an algorithm based on the following idea (you can do it as you wish):
+* It can be based on creating the strings to represent each intermediate board of the game following the convention used in activity 1.
+* The process of creating a game would consist of reading the following line of the game file and creating the current move from the previous situation of the board (replacing the game position with the symbol indicating there is no piece “-” and putting the corresponding piece in the position corresponding to the final position of the move).
+* You can use the board constructor based on the strings described in activity 1.
+* Once the board resulting from the current move has been created, you can put it in the unordered list of game boards.
+* This process would be repeated until the last move.
+* The description of the boards has already mentioned a method making a move from the string representing a board compatible with this description. Your code can contain a statement like the following:
+
+ti_mas1 = Board::moverString(dim, dim, c1, f1, c2, f2, ti);
+
+A scheme for what could be the core of the Game class is shown below (for example, in a game.h file)
+
+Remember the operators required by the programmed ADTs should be implemented. A pair of these are mentioned in the scheme.
+
+#pragma once
+#include <iostream>
+
+#include "board.h"
+#include "piece.h"
+#include "unorderedLinkedList.h"
+
+
+class Game
+{
+   public:
+       void setKey(int k) { ···}
+       void setName(string nmbr) { ··· }
+       void setBoards(unorderedLinkedList<Board> brds) { ···}
+
+       int getKey() { ··· }
+       string getName() { ··· }
+       unorderedLinkedList<Board> getBoards() { ··· }
+
+
+       Game(){}
+       Game(string filename,string name, int dim);
+
+
+       friend bool operator>=(const Game &p1, const Game &p2)
+       { ··· }
+
+friend ostream& operator<<(ostream& os, const Game& p){ ··· }
+
+   private:
+       int key;
+       String name;
+       unorderedLinkedList<Board> boards;
+};
+
+Representation of the tournament
+
+Only very simple tournaments with the following features are considered:
+
+? The elimination rounds are of one game only.
+? In principle, the tournament may have as many rounds as desired.
+
+You must use a binary tree search to save the tournament games with the following features:
+
+? The saved key in each game must allow us to obtain a complete binary tree when successive phases of the tournament are inserted.
+? The annex provides a possible implementation of the ChessBoard class that can be uses and simplifies your task. 
+? The only thing you need to do is:
+* To make sure that the rest of your classes are compatible with this one.
+* To make sure you insert the games of each round in the order indicated in the annex.
+? The annex contains a functional version of the ChessTournament class that can be used as it is and can be extended if necessary.
+
+Result of this activity
+
+You must generate a .zip file with all the application files. Your files must meet the following conditions:
+
+? You must complete the .cpp and .h files described above in accordance with the specifications provided. 
+? Specifically, you must create or complete at least the classes Game, Piece (and sub-classes), Coordinates, Squares, Board and ChessTournament.
+? You must also include the main test programs that you consider appropriate.
+? You must also provide the. a2pgn files you have used.
+? You must make sure you have followed the instructions which have been highlighted as mandatory.
+? Specifically, you must make sure that your code can be invoked by the following main program:
+
+int main()
+{
+   ChessTournament<4> trn;
+
+
+   trn.insertGame(Game("p1.a2pgn", "final", 8));
+   trn.insertGame(Game("p2.a2pgn", "semifinal1", 8));
+   trn.insertGame(Game("p3.a2pgn", "semifinal2", 8));       
+
+   trn.show();
+
+   return 0;
+}
+
+? In which:
+* A chess tournament with four rounds is stated.
+* A final and two semifinals are inserted from games which are in the files. Note that the annex only contains the first file.
+* The chess tournament is shown which, as can be seen in the annex list, is a post order routine of the game tree.
+? You must attach your memory, in which you must only describe the aspects of the application which are “your contribution”. Avoid, above all, adding to your memory explanations, code fragments or images which are already in the description. In this memory, you must indicate, above all, the following:
+* The design decisions you have taken and which are not included in this statement.
+* The description of the platform where you have developed this (operating system and development environment). Ideally, you should use “Visual Studio Code” although this is not essential.
+* Instructions for generating the application executable. Ideally, you should attach the content of the directory. vscode which contains the configuration files of Visual Studio Code compiling and debugging script.
+
+Marking schema
+
+The following marking schema will be applied:
+
+Application Performance
+Shared equally among the different sections80 %Documentation of the application20 %Maximum length of the activity
+
+A maximum of no more than one page should be assigned to each documented “element” (each class, module structure, compilation and execution instructions) in the memory.
+
+As regards the code, there is no limit beyond respecting what is requested in this description.
+
+
+
+Annex
+
+About the boards
+
+To show the boards.
+
+The code of a method achieving the following graphical representation of the boards is as follows:
+
+
+
+If you like this representation, you may copy it and use this code. Remember that it uses static board attributes to represent each Unicode character generated by this representation.
+
+ostream& operator<<(ostream& os,  Board& t)
+{
+   int numCols = t.getNumColumns();
+   int numRows = t.getNumRows();
+   Square *checks = t.getSquares();
+
+   cout << endl;
+   for (int j=0; j < numCols; j++)
+   {
+       if (j==0 )
+           os << Board::TOP_LEFT_CORNER;
+       if (j < numCols - 1)
+           os << Board::LINE_H +Board::LINE_H +Board::LINE_H + Board::TOP_EDGE;
+       else
+           os << Board::LINE_H +Board::LINE_H +Board::LINE_H + Board::TOP_RIGHT_CORNER;
+   }
+   for (int i = numRows-1; i>=0; i--)
+   {
+       os << endl << Board::LINE_V;
+       for (int j=0; j < numCols ; j++)
+       {
+           Piece *crrnt_p = t.pieceEn( Coordinates::indexAColumn(j), i );
+           if (current == NULL)
+           {
+               if ((i+j)%2 != 0 )
+                   os << Board::WHITE_CELL +Board::WHITE_CELL +Board::WHITE_CELL;
+               else
+                   os << Board::EMPTY_BLACK_CELL +Board::EMPTY_BLACK_CELL+Board::EMPTY_BLACK_CELL;
+          
+           }
+           else
+           {
+                if ((i+j)%2 != 0 )
+                {
+                   os << Board::WHITE_CELL;
+                   crrnt_p->print(os);
+                   os << Board::WHITE_CELL;
+                }
+                else
+                {
+                    os << Board::OCCUPIED_BLACK_CELL;
+                    crrnt_p->print(os);
+                    os << Board::OCCUPIED_BLACK_CELL;
+                }
+
+           }
+           os << Board::LINE_V;
+       }
+       os  << " " << i+1 << endl ;
+       for (int j=0; j < numCols; j++)
+       {
+           if (i== 0)
+           {
+               if (j==0 )
+                   os << Board::BOT_LEFT_CORNER + Board::LINE_H + Board::LINE_H  + Board::LINE_H  + Board::BOT_EDGE;
+               else if ( j == numCols -1)
+                   os << Board::LINE_H + Board::LINE_H + Board::LINE_H +  Board::BOT_RIGHT_CORNER;
+               else
+                   os << Board::LINE_H + Board::LINE_H + Board::LINE_H +  Board::BOT_EDGE;
+           }
+           else
+           {
+               if (j==0 )
+                   os << Board::LEFT_EDGE + Board::LINE_H + Board::LINE_H  + Board::LINE_H  + Board::MID_EDGE;
+               else if ( j == numCols -1 )
+                   os << Board::LINE_H + Board::LINE_H + Board::LINE_H +  Board::RIGHT_EDGE;
+               else
+                   os << Board::LINE_H + Board::LINE_H + Board::LINE_H +  Board::MID_EDGE;
+           }
+       }       
+   }
+
+
+   os << endl;
+   os << " ";
+   for (int j=0; j < numCols; j++)
+   {
+       os << " " << Coordeinates::indexAColumn(j) << "  ";
+   }
+   os  << endl ;
+
+   return os;
+}
+
+Note that the definition and declaration of the following static attributes is required.
+
+const string Board::LEFT_EDGE = "\U00002523";
+const string Board::RIGHT_EDGE = "\U0000252B";
+const string Board::MID_EDGE = "\U0000254B";
+const string Board::LINE_H = "\U00002501";
+const string Board::LINE_V = "\U00002503";
+const string Board::TOP_LEFT_CORNER = "\U0000250F";
+const string Board::TOP_RIGHT_CORNER = "\U00002513";
+const string Board::BOT_LEFT_CORNER = "\U00002517";
+const string Board::BOT_RIGHT_CORNER = "\U0000251B";
+const string Board::TOP_EDGE = "\U00002533";
+const string Board::BOT_EDGE = "\U0000253B";
+const string Board::EMPTY_BLACK_CELL = "\U00002592";
+const string Board::OCCUPIED_BLACK_CELL = "\U00002591";
+const string Board::WHITE_CELL = " ";
+
+const string Board::BOARD_START_GAME = "RNBQKBNRPPPPPPPP--------------------------------pppppppprnbqkbnr”;
+
+
+
+chessTournament.h (example of use of static attributes and methods)
+
+As shown in previous sections, you can use this .h file to ensure that the rest of your classes are compatible. Therefore, the most significant features of this code which you can ignore in your solutions are the following:
+
+? The static method keysGames will calculate the keys to be used to insert the tournament games in order. Remember that the order is:
+* Final.
+* Semifinals (1 and 2).
+* Quarterfinals (1 and 2 of semifinal 1, and 1 and 2 of semifinal 2).
+* Round of 16 (1 and 2 of quarterfinals 1, 1 and 2 of quarterfinals 2, 1 and 2 of quarterfinals 3, and 1 and 2 of quarterfinals 4).
+* And so on.
+? This method puts he key values in the static key attribute.
+? The insertion method of a tournament game (which is what should be invoked in your code and whose implementation is provided to you) is responsible for assigning the right key to the game before inserting the key into the binary search tree. It must also maintain the correct value of the current_round attribute for successive insertions. You can ignore all these low-level details because the code provided does this process as long as you invoke the method void insertGame(Game p).
+? Note that you are also given the definition of these two static attributes (keys and current_round).
+
+#include <iostream>
+#include <set>
+#include <cmath>
+
+#include "game.h"
+#include "bSearchTreeType.h"
+
+
+
+using namespace std;
+
+template <int N>
+class ChessTournament
+{
+   private:
+      
+       bSearchTreeType<Game> games;
+       String name;
+
+       int num_rounds = N;
+
+   public:
+       string getName() { return name; }
+       int getNumRounds() { return num_rounds; }
+
+       void insertGame(Game p) {
+           current_round++;
+           p.setKey(keys[current_round]);
+           games.insert(p);
+       }
+
+       void show() { games.postorder(); }
+
+       static int keys[(int)pow(2,N)-1];
+       static int current_round;
+       static void keysGames();
+      
+       ChessTournament()
+       {
+           keysGames();
+       }
+
+
+
+};
+
+
+
+
+template <int N>
+void ChessTournament<N>::keysGames()
+{
+   int numRounds = N;
+   set<int> indexes_used;
+   int limit = (int)pow(2, numRounds) - 1;
+   int n = numRounds - 1;
+
+  
+   int i=0;
+   int index = (int)pow(2, n);
+
+   keys[i++] = index;
+   indexes_used.insert(index);
+   while (n > 0)
+   {
+       n = n - 1;
+      
+      
+       int j;
+       j = 1;
+
+
+       index = j*(int)pow(2, n);
+       if ( indexes_used.find(index) == indexes_used.end() )
+       {
+           keys[i++] = index;
+           indexes_used.insert(index);
+       }
+
+       while (index <= limit)
+       {
+
+           if ( indexes_used.find(index) == indexes_used.end() )
+           {
+
+               keys[i++] = index;
+               indexes_used.insert(index);
+           }
+           j++;
+           index = j*(int)pow(2, n);           
+       }
+   }
+}
+
+
+
+template <int N> int ChessTournament<N>::keys[];
+template <int N> int ChessTournament<N>::current_round = 0;
+
+p1.a2pgn
+
+The content of the game used in the main program example is show below.
+
+c 2 c 4+
+e 7 e 5+
+b 1 c 3+
+b 8 c 6+
+g 2 g 3+
+g 8 f 6+
+f 1 g 2+
+f 8 c 5+
+e 2 e 3+
+d 7 d 6+
+g 1 e 2+
+c 8 e 6+
+d 2 d 4+
+e 5 d 4+
+e 3 d 4+
+c 6 d 4+
+e 2 e 4+
+c 7 c 6+
+d 4 e 6+
+f 7 e 6+
+e 1 g 1+
+h 1 f 1+
+e 8 g 8+
+h 8 f 8+
+c 1 e 3+
+c 5 e 3+
+f 2 e 3+
+d 8 b 6+
+d 1 d 2+
+a 8 d 8+
+c 3 a 4+
+b 6 a 6+
+b 2 b 3+
+b 7 b 5+
+a 4 b 2+
+a 6 b 6+
+a 2 a 4*
+
+Data Structure and Algorithm Analysis in C++ (code COP3530)
+
+
+
+Activities
+
